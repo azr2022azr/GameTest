@@ -13,19 +13,45 @@ class GameWindow < Gosu::Window
     super 320, 224
     self.caption = "Tutorial Game"
     @backgroundImage = Gosu::Image.new("C:/GameTest/textures/backgroundPlaceholder.png", :tileable => true)
-    @startButton = Button.new(100, 50, 160, 100, "startButton", "startButton", 2)
-    @infoButton = Button.new(100, 50, 160, 170, "infoButton", "infoButton", 3)
+    @startButton = Button.new(100, 50, 160, 100, "startButton", "startButton", 8)
+    @infoButton = Button.new(100, 50, 160, 170, "infoButton", "infoButton", 12)
     @infoImage = Gosu::Image.new("C:/GameTest/textures/infoPlaceholder.png", :tileable => true)
     @gamePhase = 1
+    @tempsButtonReturn = [] #current button phase output. if not all -1, will find which isn't -1 and change phase
+    @backButtonInfo = Button.new(100, 50, 60, 180, "backButton", "backButtonID", 4)
+    @dark = Gosu::Image.new("C:/GameTest/textures/blackScreen.png")
+    @timer = 0
+    @totalTimer = 0
+    @lastPhaseDivFour = 0
+    @player = Gosu::Image.new("C:/GameTest/textures/player.png")
   end
   #update draw
   def draw
+    @timer = Time.now
+
+    if @lastPhaseDivFour
+      @lastPhaseDivFour = false
+      sleep 1
+    end
+
     if @gamePhase == 1
       @backgroundImage.draw(0,0,0)
       @startButton.draw
       @infoButton.draw
+
     elsif @gamePhase == 3
       @infoImage.draw(0,0,0)
+      @backButtonInfo.draw
+
+    elsif (@gamePhase % 4 == 0)
+      @dark.draw(0,0,0)
+      @lastPhaseDivFour = true
+      @gamePhase = @gamePhase/4
+    end
+
+    @totalTimer = 0.01666 - (Time.now - @timer)
+    if(@totalTimer > 0)
+      sleep @totalTimer
     end
   end
 
@@ -35,10 +61,22 @@ class GameWindow < Gosu::Window
 
   #update info button
   def update
+    @tempsButtonReturn = []
     if @gamePhase == 1
       temp = 0
-      @gamePhase = @startButton.tickButton(mouse_x, mouse_y)
-      @gamePhase = @infoButton.tickButton(mouse_x, mouse_y)
+      @tempsButtonReturn << @startButton.tickButton(mouse_x, mouse_y)
+      @tempsButtonReturn << @infoButton.tickButton(mouse_x, mouse_y)
+      if @tempsButtonReturn[0] != -1
+        @gamePhase = @tempsButtonReturn[0]
+      elsif @tempsButtonReturn[1] != -1
+        @gamePhase = @tempsButtonReturn[1]
+      end
+    elsif @gamePhase == 3
+      temp = 0
+      @tempsButtonReturn << @backButtonInfo.tickButton(mouse_x, mouse_y)
+      if @tempsButtonReturn[0] != -1
+        @gamePhase = @tempsButtonReturn[0]
+      end
     end
     puts(@gamePhase)
   end
@@ -83,7 +121,7 @@ class Button
       @imageID = @ogID + "Hlgt"
       if Gosu.button_down? Gosu::MsLeft
         @imageID = @ogID
-        return tozone
+        return @tozone
       end
     else
       @imageID = @ogID #resets to default
