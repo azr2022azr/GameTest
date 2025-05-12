@@ -48,6 +48,7 @@ class GameWindow < Gosu::Window
       end
       @player.draw
       @map1.draw(-1*(@player.getX()%360 + 160),0,0)
+      @map2.draw(-1*(@player.getX()%360 - 160),0,0)
 
     elsif @gamePhase == 3
       @infoImage.draw(0,0,0)

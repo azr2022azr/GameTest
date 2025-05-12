@@ -120,7 +120,7 @@ class Player
       elsif @veloc < @spcap
         @veloc = @accelMod * @veloc
       end
-      @xPos += @veloc / Math.sqrt(2)
+      @xPos -= @veloc / Math.sqrt(2)
       @yPos -= @veloc / Math.sqrt(2)
       @lastpress = 4
 
