@@ -1,6 +1,7 @@
 #Import Gosu. Press f5 to update code after edits
 require 'gosu'
 require_relative 'usefulFunctions'
+require_relative "player"
 
 #gamephase info
 #1 = title screen. 2 = game. 3 = info. Every 4th will be black transfer screen to /4. ex 4 -> 1, 8 -> 2
@@ -23,7 +24,9 @@ class GameWindow < Gosu::Window
     @timer = 0
     @totalTimer = 0
     @lastPhaseDivFour = 0
-    @player = Gosu::Image.new("C:/GameTest/textures/player.png")
+    @map1 = Gosu::Image.new("C:/GameTest/textures/mapBackgroundA1.png")
+    @map2 = Gosu::Image.new("C:/GameTest/textures/mapBackgroundA2.png")
+    @player = Player.new("Feng")
   end
   #update draw
   def draw
@@ -38,6 +41,13 @@ class GameWindow < Gosu::Window
       @backgroundImage.draw(0,0,0)
       @startButton.draw
       @infoButton.draw
+
+    elsif @gamePhase == 2
+      if @player.getlife > 0
+        @player.tickPlayer
+      end
+      @player.draw
+      @map1.draw(-1*(@player.getX()%360 + 160),0,0)
 
     elsif @gamePhase == 3
       @infoImage.draw(0,0,0)
@@ -78,10 +88,10 @@ class GameWindow < Gosu::Window
         @gamePhase = @tempsButtonReturn[0]
       end
     end
-    puts(@gamePhase)
+    #puts(@gamePhase)
   end
 end
-
+#s
 #Button class
 class Button
   def initialize(xsize, ysize, xpos, ypos, imageID, name, tozone)
