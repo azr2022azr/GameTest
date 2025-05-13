@@ -57,6 +57,10 @@ class Player
     return @yPos
   end
 
+  def damagePla(dam)
+    @hp -= dam
+  end
+
   def die
     @lives -= 1
     @name = name
@@ -203,10 +207,6 @@ class Player
     elsif @yPos < -112
       @yPos = -112
     end
-
-    puts (@xPos)
-    puts (@yPos)
-    puts (@veloc)
   end
 
   def draw

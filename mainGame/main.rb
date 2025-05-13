@@ -2,6 +2,7 @@
 require 'gosu'
 require_relative 'usefulFunctions'
 require_relative "player"
+require_relative "enemy"
 
 #gamephase info
 #1 = title screen. 2 = game. 3 = info. Every 4th will be black transfer screen to /4. ex 4 -> 1, 8 -> 2
@@ -27,6 +28,7 @@ class GameWindow < Gosu::Window
     @map1 = Gosu::Image.new("C:/GameTest/textures/mapBackgroundA1.png")
     @map2 = Gosu::Image.new("C:/GameTest/textures/mapBackgroundA2.png")
     @player = Player.new("Feng")
+    @enemies = []
   end
   #update draw
   def draw
@@ -47,8 +49,19 @@ class GameWindow < Gosu::Window
         @player.tickPlayer
       end
       @player.draw
-      @map1.draw(-1*(@player.getX()%360 + 160),0,0)
-      @map2.draw(-1*(@player.getX()%360 - 160),0,0)
+      @map1.draw(-1*(@player.getX()%640 -320),0,0)
+      @map2.draw(-1*((@player.getX()+320)%640 -320),0,0)
+
+      if(Random.rand(0..100) == 0)
+        @enemies.push(Enemy.new("basic", 15, 15))
+      end
+      for enem in @enemies do
+        enem.tickEnemy(@player.getX, @player.getY)
+        if(enem.hitPlayer(@player.getX, @player.getY))
+          @player.damageHP(enem.getDamage)
+        end
+        enem.draw(@player.getX, @player.getY)
+      end
 
     elsif @gamePhase == 3
       @infoImage.draw(0,0,0)
