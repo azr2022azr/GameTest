@@ -29,6 +29,7 @@ class GameWindow < Gosu::Window
     @map2 = Gosu::Image.new("C:/GameTest/textures/mapBackgroundA2.png")
     @player = Player.new("Feng")
     @enemies = []
+    @attacklist = []
   end
   #update draw
   def draw
@@ -51,18 +52,42 @@ class GameWindow < Gosu::Window
       @player.draw
       @map1.draw(-1*(@player.getX()%640 -320),0,0)
       @map2.draw(-1*((@player.getX()+320)%640 -320),0,0)
+      @attacklist = @player.throwAttackList
 
-      if(Random.rand(0..100) == 0)
-        @enemies.push(Enemy.new("basic", 15, 15))
+      if(Random.rand(0..100) == 0 && @enemies.length < 20)
+        @enemies.push(Enemy.new("basic", @player.getX + Random.rand(-170..170), Random.rand(0...224)))
       end
+
+      @player.bumpEnemies(@enemies)
+
+      for a in @attacklist
+        a.draw
+      end
+
+      enemtemp = 0
       for enem in @enemies do
+        enemtemp += 1
         enem.tickEnemy(@player.getX, @player.getY)
+
         if(enem.hitPlayer(@player.getX, @player.getY))
-          @player.damageHP(enem.getDamage)
+          @player.damagePla(enem.getDamage)
         end
-        enem.draw(@player.getX, @player.getY)
+
+        if (distance(enem.getX, @player.getX) < 170)
+          enem.draw(@player.getX, @player.getY)
+        end
+        if(enem.getHP <= 0)
+          @enemies.delete_at(enemtemp - 1)
+        end
       end
 
+
+
+      temphp = @player.showHealth.to_f/@player.getMaxHP.to_f
+      draw_rect(0,0,42,14,Gosu::Color.argb(0xff_000000), 1)
+      draw_rect(1,1,40,12,Gosu::Color.argb(0xff_ffffff), 1)
+      draw_rect(1,1,(temphp * 40).round(0),12,Gosu::Color.argb(0xff_ff0000), 1)
+#
     elsif @gamePhase == 3
       @infoImage.draw(0,0,0)
       @backButtonInfo.draw
