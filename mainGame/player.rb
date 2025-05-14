@@ -98,7 +98,6 @@ class Player
 
   def giveAcc(acc)
     @accessory.push(acc)
-    
   end
 
   def setWep(wep, slot)
