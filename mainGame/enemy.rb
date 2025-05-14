@@ -1,15 +1,19 @@
 require_relative "usefulFunctions"
 class Enemy
-  def initialize(name, x, y)
-    @enhp = 1
-    @enws = Random.rand(30..70)
-    @endamage = 1
+  def initialize(name, x, y, backdiff)
+    @diff = backdiff
+    @enhp = 50 + Random.rand(30..70) * (1+(@diff/30))
+    @enws = 20 + Random.rand(5..20) * (1+(@diff/30))
+    @endamage = 2 * (1+(@diff/30))
     @enxPos = x
     @enyPos = y
     @enname = name
     @enSize = 26
     @name = name
-    @actionframe = "n0"
+    @actionframe = ["n", "0", "1"]
+    @kbex = 0
+    @kbey = 0
+    @invuln = 0
   end
 
   def getX
@@ -21,11 +25,23 @@ class Enemy
   end
 
   def damageHP(damage)
-    @enhp -= damage
+    if @invuln == 0
+      @enhp -= damage
+    end
   end
 
   def getHP
     return @enhp
+  end
+
+  def getKnockBack(momentx, momenty)
+    if @invuln == 0
+      @actionframe[0] = "k"
+      @actionframe[1] = "0"
+      @kbex = momentx
+      @kbey = momenty
+      @invuln = 1
+    end
   end
 
   def getDamage
@@ -45,13 +61,15 @@ class Enemy
   end
 
   def draw(playerx, playery)
+    #if playerx > @enxPos directional IMPORTANT
     #Gosu::Image.new("C:/GameTest/textures/" + @name.to_s + @actionframe.to_s + ".png").draw_rot(@enxPos, @enyPos + 112, 1)
     Gosu::Image.new("C:/GameTest/textures/" + @name.to_s + "n0.png").draw_rot(@enxPos-playerx+160, @enyPos, 1)
   end
 
   def hitPlayer(playerx, playery)
     if @actionframe[0] == "a" && @actionframe[1].to_i >= 6
-      @actionframe = "n0"
+      @actionframe[0] = "n"
+      @actionframe[1] = "0"
       if(distance(playerx, @enxPos) < @enSize) && (distance(playery, @enyPos) < @enSize)
         return true
       end
@@ -70,12 +88,33 @@ class Enemy
         @enyPos += (playery-@enyPos)/temp *0.05*@enws
       end
       if(distance(playerx, @enxPos) < @enSize/1.5) && (distance(playery, @enyPos) < @enSize/1.5)
-        @actionframe = "a0"
+        @actionframe[0] = "a"
+        @actionframe[1] = "0"
       end
     end
 
     if(@actionframe[0] == "a")
-      @actionframe = "a" + (@actionframe[1].to_i + 1).to_s
+      @actionframe[1] = (@actionframe[1].to_i + 1).to_s
+    
+    elsif @actionframe[0] == "k"
+      if((@actionframe[1].to_i) >= 24)
+        @actionframe[0] = "n"
+        @actionframe[1] = "0"
+      else
+        @actionframe[1] = (@actionframe[1].to_i + 1).to_s
+        @enxPos += @kbex
+        @enyPos += @kbey
+        @kbex /= 1.1
+        @kbey /= 1.1
+      end
+    end
+
+    if(@invuln > 0)
+      if(@invuln > 12)
+        @invuln = 0
+      else
+        @invuln += 1
+      end
     end
 
     if @enyPos > 224

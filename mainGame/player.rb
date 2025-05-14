@@ -3,18 +3,21 @@ require_relative "attack"
 class Player 
   def initialize(name)
     @name = name
-    @hp = 100
-    @ws = 100
     @xPos = 0
     @yPos = 0
     @lives = 9
     @veloc = 0
-    @maxhp = 100
-    @spcap = @ws * 0.05
     @accelMod = 1.8
     @attacklist = []
     @enemies = []
+    @stats = [0, 100, 100, 0, 0]
+    @base = [0, 100, 100, 0, 0]
     @phase = "ln0"
+    @atkCooldown = 0
+    @atkRate = 8
+    @level = 1
+    @xp = 90
+    @sust = 0
 
     @weapon1 = Equipment.new(1, "Default Dagger", 1, 1)
     @weapon2 = Equipment.new(0, "none", 1, 1)
@@ -22,11 +25,35 @@ class Player
     @armor = Equipment.new(0,"none", 2, 1)
   
     @accessory = [Equipment.new(0,"none", 3, 1)]
-    
+
+    for i in @accessory do
+      loc = 0
+      for j in i.getStats
+        @stats[loc] += i.getStats[loc]
+        loc += 1
+      end
+    end
+
+    @hp = @stats[1]
+    @maxhp = @stats[1]
+    @ws = @stats[2]
+    @spcap = @ws * 0.05
   end
 
   def showHealth 
     return @hp
+  end
+
+  def giveXP(val)
+    @xp += val
+  end
+
+  def showXP
+    return @xp
+  end
+
+  def levelUp
+    @level += 1
   end
 
   def getMaxHP
@@ -69,9 +96,21 @@ class Player
     @hp -= dam
   end
 
+  def giveAcc(acc)
+    @accessory.push(acc)
+    
+  end
+
+  def setWep(wep, slot)
+    if(slot == 1)
+      @weapon1 = wep
+    else
+      @weapon2 = wep
+    end
+  end
+
   def die
     @lives -= 1
-    @name = name
     @hp = 100
     @maxhp = 100
     @ws = 100
@@ -82,8 +121,11 @@ class Player
     @accelMod = 1.8
     @lastpress = 0
     @attacklist = []
+    @sust = 0
     @enemies = []
     @phase = "ln0" #direction, action, frame
+    @atkCooldown = 0
+    @atkRate = 4
   end
 
   def getlife
@@ -99,9 +141,25 @@ class Player
   end
 
   def tickPlayer
-    puts(@phase)
+    for i in @accessory do
+      loc = 0
+      for j in i.getStats
+        @stats[loc] = @base[loc] + i.getStats[loc]
+        loc += 1
+      end
+    end
+
+    if(@hp +@stats[0]/24 < @maxhp)
+      @hp += @stats[0]/24
+    else
+      @hp = @maxhp
+    end
+    @maxhp = @stats[1]
+    @ws = @stats[2]
+    @spcap = @ws * 0.05
+
     if @phase[1] == "n" || @phase[1] == "m"
-      if (Gosu.button_down? Gosu::MsLeft)
+      if (Gosu.button_down? Gosu::MsLeft) && (@atkCooldown == 0)
         @phase[1] = "a"
         @phase[2] = "0"
 
@@ -116,6 +174,7 @@ class Player
         @xPos += @veloc / Math.sqrt(2)
         @yPos -= @veloc / Math.sqrt(2)
         @lastpress = 1
+        @sust = 1
         @phase[0] = "r"
 
       elsif (Gosu.button_down? Gosu::KbS) && (Gosu.button_down? Gosu::KbD)
@@ -129,6 +188,7 @@ class Player
         @xPos += @veloc / Math.sqrt(2)
         @yPos += @veloc / Math.sqrt(2)
         @lastpress = 2
+        @sust = 2
         @phase[0] = "r"
       
       elsif (Gosu.button_down? Gosu::KbS) && (Gosu.button_down? Gosu::KbA)
@@ -142,6 +202,7 @@ class Player
         @xPos -= @veloc / Math.sqrt(2)
         @yPos += @veloc / Math.sqrt(2)
         @lastpress = 3
+        @sust = 3
         @phase[0] = "l"
       
       elsif (Gosu.button_down? Gosu::KbW) && (Gosu.button_down? Gosu::KbA)
@@ -155,6 +216,7 @@ class Player
         @xPos -= @veloc / Math.sqrt(2)
         @yPos -= @veloc / Math.sqrt(2)
         @lastpress = 4
+        @sust = 4
         @phase[0] = "l"
 
       elsif (Gosu.button_down? Gosu::KbW)
@@ -167,6 +229,7 @@ class Player
         end
         @yPos -= @veloc
         @lastpress = 5
+        @sust = 5
         @phase[0] = "u"
       
       elsif (Gosu.button_down? Gosu::KbS)
@@ -179,6 +242,7 @@ class Player
         end
         @yPos += @veloc
         @lastpress = 6
+        @sust = 6
         @phase[0] = "d"
 
       elsif (Gosu.button_down? Gosu::KbA)
@@ -191,6 +255,7 @@ class Player
         end
         @xPos -= @veloc
         @lastpress = 7
+        @sust = 7
         @phase[0] = "l"
 
       elsif (Gosu.button_down? Gosu::KbD)
@@ -203,6 +268,7 @@ class Player
         end
         @xPos += @veloc
         @lastpress = 8
+        @sust = 8
         @phase[0] = "r"
       
       else
@@ -237,14 +303,23 @@ class Player
 
     elsif(@phase[1] == "a")
       if(@phase[2] == "1")
-        @attacklist.push(PlayerAttack.new(@xPos, @yPos, @weapon1.getDPS, @lastpress, @enemies))
+        @attacklist.push(PlayerAttack.new(@xPos, @yPos, @weapon1.getDPS * (1 + (0.01*@stats[3])) + @stats[4], @sust, @enemies))
       end
-      if(@phase[2] == "4")
+      if(@phase[2] == "8")
         @phase[1] = "n"
         @phase[2] = "0"
+        @atkCooldown = 1
       end
       @phase[2] = (@phase[2].to_i + 1).to_s
     end
+
+    if @atkCooldown > 0
+      @atkCooldown += 1
+      if @atkCooldown == @atkRate
+        @atkCooldown = 0
+      end
+    end
+
 
     hh = 0
     for e in @attacklist
