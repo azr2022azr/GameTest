@@ -2,8 +2,8 @@ require_relative "usefulFunctions"
 class Enemy
   def initialize(name, x, y, backdiff)
     @diff = backdiff
-    @enhp = 50 + Random.rand(30..70) * (1+(@diff/30))
-    @enws = 20 + Random.rand(5..20) * (1+(@diff/30))
+    @enhp = 50 + Random.rand(30..70) * (1+(@diff/5))
+    @enws = 20 + Random.rand(5..20) * (1+(@diff/20))
     @endamage = 2 * (1+(@diff/30))
     @enxPos = x
     @enyPos = y
