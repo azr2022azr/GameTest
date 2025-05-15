@@ -18,9 +18,10 @@ class PlayerAttack
   end
 
   def draw
-    zone = @size + 26
+    zone = @size + 16
     @x = @basex
     @y = @basey
+    @image = Gosu::Image.new("C:/GameTest/textures/slash/a" +@ticksalive.to_s + ".png")
     if(@rot == 1)
       
       @image.draw_rot(160+(zone/Math.sqrt(2)), @y-(zone/Math.sqrt(2)), 1, 45)

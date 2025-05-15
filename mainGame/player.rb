@@ -10,9 +10,9 @@ class Player
     @accelMod = 1.8
     @attacklist = []
     @enemies = []
-    @stats = [0, 100, 100, 0, 0]
-    @base = [0, 100, 100, 0, 0]
-    @phase = "ln0"
+    @stats = [0.0, 100.0, 100, 0.0, 0.0]
+    @base = [0.0, 100.0, 100.0, 0.0, 0.0]
+    @phase = ["l", "n", "0"]
     @atkCooldown = 0
     @atkRate = 8
     @level = 1
@@ -122,7 +122,7 @@ class Player
     @attacklist = []
     @sust = 0
     @enemies = []
-    @phase = "ln0" #direction, action, frame
+    @phase = ["l", "n", "0"]
     @atkCooldown = 0
     @atkRate = 4
   end
@@ -148,8 +148,12 @@ class Player
       end
     end
 
-    if(@hp +@stats[0]/24 < @maxhp)
-      @hp += @stats[0]/24
+    if(@hp +@stats[0]/24.0 < @maxhp)
+      if(@stats[0]/24.0 < @maxhp/2400.0)
+        @hp += @stats[0]/24.0
+      else
+        @hp += @maxhp/2400.0
+      end
     else
       @hp = @maxhp
     end

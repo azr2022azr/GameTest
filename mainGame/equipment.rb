@@ -8,7 +8,7 @@ class Equipment
     @type = type
     #HPR, hp, ws, d%, dr
     @stats = [0,0,0,0,0]
-    @valueList = [1, 1, 1, 1, 1]
+    @valueList = [0.1, 1, 0.5, 1, 1]
 
     if(rarity != 0 && @type == 3)
         for i in 1..rarity do

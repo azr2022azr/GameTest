@@ -169,15 +169,15 @@ class GameWindow < Gosu::Window
       for i in @wo1.getStats
         if(i != 0)
           if(c == 0)
-            t = "Heal: " + i.to_s
+            t = "Heal: " + i.round(1).to_s
           elsif c == 1
-            t = "HP: " + i.to_s
+            t = "HP: " + i.round(1).to_s
           elsif c == 2
-            t = "Spd: " + i.to_s
+            t = "Spd: " + i.round(1).to_s
           elsif c == 3
-            t = "Dmg: " + i.to_s
+            t = "Dmg: " + i.round(1).to_s
           elsif c == 4
-            t = "Dmg%: " + i.to_s
+            t = "Dmg%: " + i.round(1).to_s
           end
           @font.draw_text(t, 30, 80 + 22*s, 1)
           s+= 1
@@ -205,15 +205,15 @@ class GameWindow < Gosu::Window
       for i in @wo2.getStats
         if(i != 0)
           if(c == 0)
-            t = "Heal: " + i.to_s
+            t = "Heal: " + i.round(1).to_s
           elsif c == 1
-            t = "HP: " + i.to_s
+            t = "HP: " + i.round(1).to_s
           elsif c == 2
-            t = "Spd: " + i.to_s
+            t = "Spd: " + i.round(1).to_s
           elsif c == 3
-            t = "Dmg: " + i.to_s
+            t = "Dmg: " + i.round(1).to_s
           elsif c == 4
-            t = "Dmg%: " + i.to_s
+            t = "Dmg%: " + i.round(1).to_s
           end
           @font.draw_text(t, 130, 80 + 22*s, 1)
           s+= 1
@@ -228,15 +228,15 @@ class GameWindow < Gosu::Window
       for i in @wo3.getStats
         if(i != 0)
           if(c == 0)
-            t = "Heal: " + i.to_s
+            t = "Heal: " + i.round(1).to_s
           elsif c == 1
-            t = "HP: " + i.to_s
+            t = "HP: " + i.round(1).to_s
           elsif c == 2
-            t = "Spd: " + i.to_s
+            t = "Spd: " + i.round(1).to_s
           elsif c == 3
-            t = "Dmg: " + i.to_s
+            t = "Dmg: " + i.round(1).to_s
           elsif c == 4
-            t = "Dmg%: " + i.to_s
+            t = "Dmg%: " + i.round(1).to_s
           end
           @font.draw_text(t, 230, 80 + 22*s, 1)
           s+= 1
