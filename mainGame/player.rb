@@ -384,6 +384,15 @@ class Player
       hh += 1
     end
 
+    hh = 0
+    for e in @parrylist
+      e.tickAttack
+      if(e.kILLYOURSELF)
+        @parrylist.delete_at(hh)
+      end
+      hh += 1
+    end
+
     if @yPos > 224
       @yPos = 224
     elsif @yPos < 0
