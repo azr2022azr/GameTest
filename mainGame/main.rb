@@ -24,7 +24,7 @@ class GameWindow < Gosu::Window
     @wo1 = 0
     @wo2 = 0
     @wo3 = 0
-    @font = Gosu::Font.new(16)
+    @font = Gosu::Font.new(12)
     @backdiff = 1
     @infoImage = Gosu::Image.new("C:/GameTest/textures/infoPlaceholder.png", :tileable => true)
     @gamePhase = 1
@@ -99,6 +99,7 @@ class GameWindow < Gosu::Window
       @map1.draw(-1*(@player.getX()%640 -320),0,0)
       @map2.draw(-1*((@player.getX()+320)%640 -320),0,0)
       @attacklist = @player.throwAttackList
+      @parrylist = @player.throwParryList
 
       if(Random.rand(0..100) == 0 && @enemies.length < 20)
         @enemies.push(Enemy.new("basic", @player.getX + Random.rand(-170..170), Random.rand(0...224), @backdiff))
@@ -111,6 +112,10 @@ class GameWindow < Gosu::Window
       @player.bumpEnemies(@enemies)
 
       for a in @attacklist
+        a.draw
+      end
+
+      for a in @parrylist
         a.draw
       end
 
@@ -190,12 +195,15 @@ class GameWindow < Gosu::Window
 
       if(@wo1.getType == 1)
         @font.draw_text("DPS: " + @wo1.getDPS.round(0).to_s, 30, 80, 1)
+        @font.draw_text("Slot: " + @wo1.getslot.to_s, 30, 102, 1)
       end
       if(@wo2.getType == 1)
         @font.draw_text("DPS: " + @wo2.getDPS.round(0).to_s, 130, 80, 1)
+        @font.draw_text("Slot: " + @wo1.getslot.to_s, 130, 102, 1)
       end
       if(@wo3.getType == 1)
         @font.draw_text("DPS: " + @wo3.getDPS.round(0).to_s, 230, 80, 1)
+        @font.draw_text("Slot: " + @wo1.getslot.to_s, 230, 102, 1)
       end
 
       s = 0
@@ -251,14 +259,14 @@ class GameWindow < Gosu::Window
       if @tempsButtonReturn[0] != -1
         @gamePhase = @tempsButtonReturn[0]
         if(@wo1.getType == 1)
-          @player.setWep(@wo1,1)
+          @player.setWep(@wo1,@wo1.getslot)
         else
           @player.giveAcc(@wo1)
         end
       elsif @tempsButtonReturn[1] != -1
         @gamePhase = @tempsButtonReturn[1]
         if(@wo2.getType == 1)
-          @player.setWep(@wo2,1)
+          @player.setWep(@wo2,@wo2.getslot)
         else
           @player.giveAcc(@wo2)
         end
@@ -266,7 +274,7 @@ class GameWindow < Gosu::Window
         puts "bun"
         @gamePhase = @tempsButtonReturn[2]
         if(@wo3.getType == 1)
-          @player.setWep(@wo3,1)
+          @player.setWep(@wo3,@wo3.getslot)
         else
           @player.giveAcc(@wo3)
         end

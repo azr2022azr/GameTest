@@ -1,5 +1,6 @@
 require_relative 'equipment'
 require_relative "attack"
+require_relative "parry"
 class Player 
   def initialize(name)
     @name = name
@@ -19,12 +20,12 @@ class Player
     @xp = 90
     @sust = 0
 
-    @weapon1 = Equipment.new(1, "Default Dagger", 1, 1)
-    @weapon2 = Equipment.new(0, "none", 1, 1)
+    @weapon1 = Equipment.new(1, "Default Dagger", 1, 1, 0)
+    @weapon2 = Equipment.new(0, "none", 1, 1, 0)
 
-    @armor = Equipment.new(0,"none", 2, 1)
+    @armor = Equipment.new(0,"none", 2, 1, 0)
   
-    @accessory = [Equipment.new(0,"none", 3, 1)]
+    @accessory = [Equipment.new(0,"none", 3, 1, 0)]
 
     for i in @accessory do
       loc = 0
@@ -125,6 +126,8 @@ class Player
     @phase = ["l", "n", "0"]
     @atkCooldown = 0
     @atkRate = 4
+    @parrylist = []
+    @useweapon = 1
   end
 
   def getlife
@@ -137,6 +140,10 @@ class Player
 
   def throwAttackList
     return @attacklist
+  end
+
+  def throwParryList
+    return @parrylist
   end
 
   def tickPlayer
@@ -161,10 +168,16 @@ class Player
     @ws = @stats[2]
     @spcap = @ws * 0.05
 
-    if @phase[1] == "n" || @phase[1] == "m"
+    if @phase[1] == "n" || @phase[1] == "w"
       if (Gosu.button_down? Gosu::MsLeft) && (@atkCooldown == 0)
         @phase[1] = "a"
         @phase[2] = "0"
+        @useweapon = 1
+      
+      elsif (Gosu.button_down? Gosu::MsRight) && (@atkCooldown == 0)
+        @phase[1] = "a"
+        @phase[2] = "0"
+        @useweapon = 2
 
       elsif (Gosu.button_down? Gosu::KbW) && (Gosu.button_down? Gosu::KbD)
         if(@veloc == 0)
@@ -179,6 +192,8 @@ class Player
         @lastpress = 1
         @sust = 1
         @phase[0] = "r"
+        @phase[2] = (@phase[2].to_i + 1).to_s
+        @phase[1] = "w"
 
       elsif (Gosu.button_down? Gosu::KbS) && (Gosu.button_down? Gosu::KbD)
         if(@veloc == 0)
@@ -193,6 +208,8 @@ class Player
         @lastpress = 2
         @sust = 2
         @phase[0] = "r"
+        @phase[2] = (@phase[2].to_i + 1).to_s
+        @phase[1] = "w"
       
       elsif (Gosu.button_down? Gosu::KbS) && (Gosu.button_down? Gosu::KbA)
         if(@veloc == 0)
@@ -207,6 +224,8 @@ class Player
         @lastpress = 3
         @sust = 3
         @phase[0] = "l"
+        @phase[2] = (@phase[2].to_i + 1).to_s
+        @phase[1] = "w"
       
       elsif (Gosu.button_down? Gosu::KbW) && (Gosu.button_down? Gosu::KbA)
         if(@veloc == 0)
@@ -221,6 +240,8 @@ class Player
         @lastpress = 4
         @sust = 4
         @phase[0] = "l"
+        @phase[2] = (@phase[2].to_i + 1).to_s
+        @phase[1] = "w"
 
       elsif (Gosu.button_down? Gosu::KbW)
         if(@veloc == 0)
@@ -234,6 +255,8 @@ class Player
         @lastpress = 5
         @sust = 5
         @phase[0] = "u"
+        @phase[2] = (@phase[2].to_i + 1).to_s
+        @phase[1] = "w"
       
       elsif (Gosu.button_down? Gosu::KbS)
         if(@veloc == 0)
@@ -247,6 +270,8 @@ class Player
         @lastpress = 6
         @sust = 6
         @phase[0] = "d"
+        @phase[2] = (@phase[2].to_i + 1).to_s
+        @phase[1] = "w"
 
       elsif (Gosu.button_down? Gosu::KbA)
         if(@veloc == 0)
@@ -260,6 +285,8 @@ class Player
         @lastpress = 7
         @sust = 7
         @phase[0] = "l"
+        @phase[2] = (@phase[2].to_i + 1).to_s
+        @phase[1] = "w"
 
       elsif (Gosu.button_down? Gosu::KbD)
         if(@veloc == 0)
@@ -273,12 +300,15 @@ class Player
         @lastpress = 8
         @sust = 8
         @phase[0] = "r"
+        @phase[2] = (@phase[2].to_i + 1).to_s
+        @phase[1] = "w"
       
       else
         @veloc = @veloc/1.2
         if @veloc < 1
           @veloc = 0
           @lastpress = 0
+          @phase[1] = "n"
         end
 
         if @lastpress == 1
@@ -304,10 +334,31 @@ class Player
         end
       end
 
+      if(@phase[2].to_i >= 12)
+        @phase[2] = "0"
+      end
+
     elsif(@phase[1] == "a")
       if(@phase[2] == "1")
-        @attacklist.push(PlayerAttack.new(@xPos, @yPos, @weapon1.getDPS * (1 + (0.01*@stats[3])) + @stats[4], @sust, @enemies))
+        if @useweapon == 1
+          if(@weapon1.getname != "none")
+            if @weapon1.getWeaponType == 0
+              @attacklist.push(PlayerAttack.new(@xPos, @yPos, @weapon1.getDPS * (1 + (0.01*@stats[3])) + @stats[4], @sust, @enemies))
+            elsif @weapon1.getWeaponType == 1
+              @parrylist.push(PlayerParry.new(@xPos, @yPos, @weapon1.getDPS * (1 + (0.01*@stats[3])) + @stats[4], @sust, @enemies))
+            end
+          end
+        else
+          if(@weapon1.getname != "none")
+            if @weapon1.getWeaponType == 0
+              @attacklist.push(PlayerAttack.new(@xPos, @yPos, @weapon2.getDPS * (1 + (0.01*@stats[3])) + @stats[4], @sust, @enemies))
+            elsif @weapon1.getWeaponType == 1
+              @parrylist.push(PlayerParry.new(@xPos, @yPos, @weapon2.getDPS * (1 + (0.01*@stats[3])) + @stats[4], @sust, @enemies))
+            end
+          end
+        end
       end
+
       if(@phase[2] == "8")
         @phase[1] = "n"
         @phase[2] = "0"
@@ -341,6 +392,10 @@ class Player
   end
 
   def draw
-    Gosu::Image.new("C:/GameTest/textures/player/" + @phase[0].to_s + "n0.png").draw_rot(160, @yPos, 1)
+    if @phase[1] == "w"
+      Gosu::Image.new("C:/GameTest/textures/player/" + @phase[0].to_s + @phase[1].to_s + (@phase[2].to_i / 6).round(0).to_s + ".png").draw_rot(160, @yPos, 1)
+    else
+      Gosu::Image.new("C:/GameTest/textures/player/" + @phase[0].to_s + "n0.png").draw_rot(160, @yPos, 1)
+    end
   end
 end

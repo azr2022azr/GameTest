@@ -10,7 +10,7 @@ class Enemy
     @enname = name
     @enSize = 26
     @name = name
-    @actionframe = ["n", "0", "1"]
+    @actionframe = ["n", "0", "l"]
     @kbex = 0
     @kbey = 0
     @invuln = 0
@@ -38,6 +38,7 @@ class Enemy
     if @invuln == 0
       @actionframe[0] = "k"
       @actionframe[1] = "0"
+      @actionframe[2] = "l"
       @kbex = momentx
       @kbey = momenty
       @invuln = 1
@@ -52,6 +53,14 @@ class Enemy
     @enxPos += val
   end
 
+  def getPhase
+    return @actionframe
+  end
+
+  def setPhase(pos, val)
+    @actionframe[pos] = val
+  end
+
   def intY(val)
     @enyPos += val
   end
@@ -63,11 +72,15 @@ class Enemy
   def draw(playerx, playery)
     #if playerx > @enxPos directional IMPORTANT
     #Gosu::Image.new("C:/GameTest/textures/" + @name.to_s + @actionframe.to_s + ".png").draw_rot(@enxPos, @enyPos + 112, 1)
-    Gosu::Image.new("C:/GameTest/textures/" + @name.to_s + "n0.png").draw_rot(@enxPos-playerx+160, @enyPos, 1)
+    if(@actionframe[0] != "k")
+      Gosu::Image.new("C:/GameTest/textures/enemy/" + @name.to_s + @actionframe[0].to_s + (@actionframe[1].to_i/7).to_s + @actionframe[2].to_s + ".png").draw_rot(@enxPos-playerx+160, @enyPos, 1)
+    else
+      Gosu::Image.new("C:/GameTest/textures/enemy/basica0" + @actionframe[2].to_s + ".png").draw_rot(@enxPos-playerx+160, @enyPos, 1)
+    end
   end
 
   def hitPlayer(playerx, playery)
-    if @actionframe[0] == "a" && @actionframe[1].to_i >= 6
+    if @actionframe[0] == "a" && @actionframe[1].to_i >= 24
       @actionframe[0] = "n"
       @actionframe[1] = "0"
       if(distance(playerx, @enxPos) < @enSize) && (distance(playery, @enyPos) < @enSize)
@@ -115,6 +128,12 @@ class Enemy
       else
         @invuln += 1
       end
+    end
+
+    if(playerx > @enxPos)
+      @actionframe[2] = "r"
+    else
+      @actionframe[2] = "l"
     end
 
     if @enyPos > 224
