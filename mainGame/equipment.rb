@@ -6,10 +6,10 @@ class Equipment
     @name = name
     @rarity = rarity
     @type = type
-    @wType = type
+    @wType = wType
     #HPR, hp, ws, d%, dr
     @stats = [0,0,0,0,0]
-    @valueList = [0.1, 1, 0.5, 1, 1]
+    @valueList = [0.01, 1, 0.05, 1, 1]
     @slot = -1
 
     if(rarity != 0 && @type == 3)
@@ -18,8 +18,8 @@ class Equipment
             @stats[rado] += Random.rand(9..13)*@valueList[rado] * backDiff
         end
     end
-    if(@type == 1)
-        @dps = (Random.new.rand(20..40) + (rarity * 10)) + (backDiff*3)
+    if(@type == 1 && rarity != 0)
+        @dps = (Random.new.rand(10..20) + (rarity * backDiff))
         @slot = Random.rand(1..2)
     end
 end

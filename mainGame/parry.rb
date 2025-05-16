@@ -8,8 +8,8 @@ class PlayerParry
     @basey = y
     @damage = damage
     @size = 16
-    @image = Gosu::Image.new("C:/GameTest/textures/parry.png")
-    @ticks = 3
+    @image = Gosu::Image.new("C:/GameTest/textures/parry/pa0.png")
+    @ticks = 6
     @ticksalive = 0
     @enemies = enemies
     @kbx = 0
@@ -21,7 +21,7 @@ class PlayerParry
     zone = @size + 16
     @x = @basex
     @y = @basey
-    @image = Gosu::Image.new("C:/GameTest/textures/parry/a" +@ticksalive.to_s + ".png")
+    @image = Gosu::Image.new("C:/GameTest/textures/parry/pa" +@ticksalive.to_s + ".png")
     if(@rot == 1)
       
       @image.draw_rot(160+(zone/Math.sqrt(2)), @y-(zone/Math.sqrt(2)), 1, 45)
@@ -78,8 +78,10 @@ class PlayerParry
   def tickParry
     for enem in @enemies
       if (distance(@x, enem.getX) < @enemies.length + @size) &&(distance(@y, enem.getY) < @enemies.length + @size)
-        if(enem.getPhase[0] == "a" && enem.getPhase[1] == 24)
-          enem.setPhase(1,0)
+        if(enem.getPhase[0] == "a" && enem.getPhase[1] == "16")
+          enem.setPhase(1, 0)
+          enem.getKnockBack(@kbx, @kby)
+          enem.damageHP(2*@damage)
         end
       end
     end

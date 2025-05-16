@@ -8,7 +8,7 @@ class PlayerAttack
     @basey = y
     @damage = damage
     @size = 16
-    @image = Gosu::Image.new("C:/GameTest/textures/slash.png")
+    @image = Gosu::Image.new("C:/GameTest/textures/slash/a0.png")
     @ticks = 8
     @ticksalive = 0
     @enemies = enemies

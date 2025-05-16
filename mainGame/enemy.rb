@@ -2,8 +2,8 @@ require_relative "usefulFunctions"
 class Enemy
   def initialize(name, x, y, backdiff)
     @diff = backdiff
-    @enhp = 50 + Random.rand(30..70) * (1+(@diff/5))
-    @enws = 20 + Random.rand(5..20) * (1+(@diff/20))
+    @enhp = 150 + Random.rand(30..70) * (1+(@diff/2))
+    @enws = 10 + Random.rand(5..20) * (1+(@diff/20))
     @endamage = 2 * (1+(@diff/30))
     @enxPos = x
     @enyPos = y
@@ -73,14 +73,14 @@ class Enemy
     #if playerx > @enxPos directional IMPORTANT
     #Gosu::Image.new("C:/GameTest/textures/" + @name.to_s + @actionframe.to_s + ".png").draw_rot(@enxPos, @enyPos + 112, 1)
     if(@actionframe[0] != "k")
-      Gosu::Image.new("C:/GameTest/textures/enemy/" + @name.to_s + @actionframe[0].to_s + (@actionframe[1].to_i/7).to_s + @actionframe[2].to_s + ".png").draw_rot(@enxPos-playerx+160, @enyPos, 1)
+      Gosu::Image.new("C:/GameTest/textures/enemy/" + @name.to_s + @actionframe[0].to_s + (@actionframe[1].to_i/6).to_s + @actionframe[2].to_s + ".png").draw_rot(@enxPos-playerx+160, @enyPos, 1)
     else
       Gosu::Image.new("C:/GameTest/textures/enemy/basica0" + @actionframe[2].to_s + ".png").draw_rot(@enxPos-playerx+160, @enyPos, 1)
     end
   end
 
   def hitPlayer(playerx, playery)
-    if @actionframe[0] == "a" && @actionframe[1].to_i >= 24
+    if @actionframe[0] == "a" && @actionframe[1].to_i >= 18
       @actionframe[0] = "n"
       @actionframe[1] = "0"
       if(distance(playerx, @enxPos) < @enSize) && (distance(playery, @enyPos) < @enSize)

@@ -4,6 +4,7 @@ require_relative 'usefulFunctions'
 require_relative "player"
 require_relative "enemy"
 require_relative "equipment"
+require_relative "parry"
 
 #gamephase info
 #1 = title screen. 2 = game. 3 = info. Every 4th will be black transfer screen to /4. ex 4 -> 1, 8 -> 2
@@ -23,6 +24,7 @@ class GameWindow < Gosu::Window
     @selectButton3 = Button.new(80, 120, 260, 112, "Weapon", "selectButton3", 2)
     @wo1 = 0
     @wo2 = 0
+    @tomere = 0
     @wo3 = 0
     @font = Gosu::Font.new(12)
     @backdiff = 1
@@ -56,11 +58,13 @@ class GameWindow < Gosu::Window
     end
 
     if @gamePhase == 1
+      @tomere = 0
       @backgroundImage.draw(0,0,0)
       @startButton.draw
       @infoButton.draw
 
     elsif @gamePhase == 2
+      @tomere += 1
       if @player.showHealth > 0
         @player.tickPlayer
       else
@@ -73,24 +77,24 @@ class GameWindow < Gosu::Window
         
         if(Random.rand(1..3) == 1)
           @selectButton1.setID("Weapon")
-          @wo1 = Equipment.new(Math.sqrt(Random.rand(1..16)), "W", 1, @backdiff)
+          @wo1 = Equipment.new(Math.sqrt(Random.rand(1..16)), "W", 1, @backdiff, Random.rand(1..2))
         else
           @selectButton1.setID("Acc")
-          @wo1 = Equipment.new(Math.sqrt(Random.rand(1..16)), "W", 3, @backdiff)
+          @wo1 = Equipment.new(Math.sqrt(Random.rand(1..16)), "W", 3, @backdiff, Random.rand(1..2))
         end
         if(Random.rand(1..3) == 1)
           @selectButton2.setID("Weapon")
-          @wo2 = Equipment.new(Math.sqrt(Random.rand(1..16)), "W", 1, @backdiff)
+          @wo2 = Equipment.new(Math.sqrt(Random.rand(1..16)), "W", 1, @backdiff, Random.rand(1..2))
         else
           @selectButton2.setID("Acc")
-          @wo2 = Equipment.new(Math.sqrt(Random.rand(1..16)), "W", 3, @backdiff)
+          @wo2 = Equipment.new(Math.sqrt(Random.rand(1..16)), "W", 3, @backdiff, Random.rand(1..2))
         end
         if(Random.rand(1..3) == 1)
           @selectButton3.setID("Weapon")
-          @wo3 = Equipment.new(Math.sqrt(Random.rand(1..16)), "W", 1, @backdiff)
+          @wo3 = Equipment.new(Math.sqrt(Random.rand(1..16)), "W", 1, @backdiff, Random.rand(1..2))
         else
           @selectButton3.setID("Acc")
-          @wo3 = Equipment.new(Math.sqrt(Random.rand(1..16)), "W", 3, @backdiff)
+          @wo3 = Equipment.new(Math.sqrt(Random.rand(1..16)), "W", 3, @backdiff, Random.rand(1..2))
         end
         sleep 1
       end
@@ -101,11 +105,11 @@ class GameWindow < Gosu::Window
       @attacklist = @player.throwAttackList
       @parrylist = @player.throwParryList
 
-      if(Random.rand(0..100) == 0 && @enemies.length < 20)
+      if(Random.rand(0..200) == 0 && @enemies.length < 20)
         @enemies.push(Enemy.new("basic", @player.getX + Random.rand(-170..170), Random.rand(0...224), @backdiff))
       end
 
-      if(Random.rand(0..1000) == 1)
+      if(@tomere % 10000 == 0)
         @backdiff += 1
       end
 
@@ -147,15 +151,18 @@ class GameWindow < Gosu::Window
       draw_rect(279,1,((@player.showXP.to_f/100) * 40).round(0),12,Gosu::Color.argb(0xff_00ff00), 1)
 #
     elsif @gamePhase == 3
+      @tomere = 0
       @infoImage.draw(0,0,0)
       @backButtonInfo.draw
 
     elsif (@gamePhase % 4 == 0)
+      @tomere = 0
       @dark.draw(0,0,0)
       @lastPhaseDivFour = true
       @gamePhase = @gamePhase/4
 
     elsif (@gamePhase == 5)
+      @tomere = 0
       @dark.draw(0,0,0)
       @enemies = []
       @attacklist = []
@@ -164,6 +171,7 @@ class GameWindow < Gosu::Window
       @gamePhase = 8
     
     elsif (@gamePhase == 6)
+      @tomere = 0
       @tempsButtonReturn = []
       @selectButton1.draw
       @selectButton2.draw
@@ -190,20 +198,36 @@ class GameWindow < Gosu::Window
         c += 1
       end#
 
-      @font.draw_text("DPS: " + @player.getWeapon1.getDPS.round(0).to_s, 10, 10, 1)
+      @font.draw_text("DPS 1: " + @player.getWeapon1.getDPS.round(0).to_s, 10, 10, 1)
+      @font.draw_text("DPS 2: " + @player.getWeapon2.getDPS.round(0).to_s, 230, 10, 1)
       @font.draw_text("Difficulty: " + @backdiff.to_s, 120, 10, 1)
 
       if(@wo1.getType == 1)
         @font.draw_text("DPS: " + @wo1.getDPS.round(0).to_s, 30, 80, 1)
         @font.draw_text("Slot: " + @wo1.getslot.to_s, 30, 102, 1)
+        if(@wo1.getWeaponType == 0)
+          @font.draw_text("Blade", 30, 124, 1)
+        elsif(@wo1.getWeaponType == 1)
+          @font.draw_text("Shield", 30, 124, 1)
+        end
       end
       if(@wo2.getType == 1)
         @font.draw_text("DPS: " + @wo2.getDPS.round(0).to_s, 130, 80, 1)
-        @font.draw_text("Slot: " + @wo1.getslot.to_s, 130, 102, 1)
+        @font.draw_text("Slot: " + @wo2.getslot.to_s, 130, 102, 1)
+        if(@wo2.getWeaponType == 0)
+          @font.draw_text("Blade", 130, 124, 1)
+        elsif(@wo2.getWeaponType == 1)
+          @font.draw_text("Shield", 130, 124, 1)
+        end
       end
       if(@wo3.getType == 1)
         @font.draw_text("DPS: " + @wo3.getDPS.round(0).to_s, 230, 80, 1)
-        @font.draw_text("Slot: " + @wo1.getslot.to_s, 230, 102, 1)
+        @font.draw_text("Slot: " + @wo3.getslot.to_s, 230, 102, 1)
+        if(@wo3.getWeaponType == 0)
+          @font.draw_text("Blade", 230, 124, 1)
+        elsif(@wo3.getWeaponType == 1)
+          @font.draw_text("Shield", 230, 124, 1)
+        end
       end
 
       s = 0

@@ -4,12 +4,13 @@ require_relative "parry"
 class Player 
   def initialize(name)
     @name = name
-    @xPos = 0
-    @yPos = 0
+    @xPos = 160
+    @yPos = 112
     @lives = 9
     @veloc = 0
     @accelMod = 1.8
     @attacklist = []
+    @parrylist = []
     @enemies = []
     @stats = [0.0, 100.0, 100, 0.0, 0.0]
     @base = [0.0, 100.0, 100.0, 0.0, 0.0]
@@ -22,8 +23,6 @@ class Player
 
     @weapon1 = Equipment.new(1, "Default Dagger", 1, 1, 0)
     @weapon2 = Equipment.new(0, "none", 1, 1, 0)
-
-    @armor = Equipment.new(0,"none", 2, 1, 0)
   
     @accessory = [Equipment.new(0,"none", 3, 1, 0)]
 
@@ -114,8 +113,8 @@ class Player
     @hp = 100
     @maxhp = 100
     @ws = 100
-    @xPos = 0
-    @yPos = 0
+    @xPos = 160
+    @yPos = 112
     @veloc = 0
     @spcap = @ws * 0.05
     @accelMod = 1.8
@@ -156,10 +155,10 @@ class Player
     end
 
     if(@hp +@stats[0]/24.0 < @maxhp)
-      if(@stats[0]/24.0 < @maxhp/2400.0)
+      if(@stats[0]/24.0 < @maxhp/4800.0)
         @hp += @stats[0]/24.0
       else
-        @hp += @maxhp/2400.0
+        @hp += @maxhp/4800.0
       end
     else
       @hp = @maxhp
@@ -175,9 +174,11 @@ class Player
         @useweapon = 1
       
       elsif (Gosu.button_down? Gosu::MsRight) && (@atkCooldown == 0)
-        @phase[1] = "a"
-        @phase[2] = "0"
-        @useweapon = 2
+        if(@weapon2.getname != "none")
+          @phase[1] = "a"
+          @phase[2] = "0"
+          @useweapon = 2
+        end
 
       elsif (Gosu.button_down? Gosu::KbW) && (Gosu.button_down? Gosu::KbD)
         if(@veloc == 0)
@@ -349,10 +350,10 @@ class Player
             end
           end
         else
-          if(@weapon1.getname != "none")
-            if @weapon1.getWeaponType == 0
+          if(@weapon2.getname != "none")
+            if @weapon2.getWeaponType == 0
               @attacklist.push(PlayerAttack.new(@xPos, @yPos, @weapon2.getDPS * (1 + (0.01*@stats[3])) + @stats[4], @sust, @enemies))
-            elsif @weapon1.getWeaponType == 1
+            elsif @weapon2.getWeaponType == 1
               @parrylist.push(PlayerParry.new(@xPos, @yPos, @weapon2.getDPS * (1 + (0.01*@stats[3])) + @stats[4], @sust, @enemies))
             end
           end
@@ -386,7 +387,7 @@ class Player
 
     hh = 0
     for e in @parrylist
-      e.tickAttack
+      e.tickParry
       if(e.kILLYOURSELF)
         @parrylist.delete_at(hh)
       end
