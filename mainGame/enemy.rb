@@ -123,7 +123,7 @@ class Enemy
     end
 
     if(@invuln > 0)
-      if(@invuln > 12)
+      if(@invuln > 3)
         @invuln = 0
       else
         @invuln += 1

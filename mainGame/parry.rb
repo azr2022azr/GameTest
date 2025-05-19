@@ -93,10 +93,16 @@ class PlayerParry
     for enem in @enemies
       if (distance(@x, enem.getX) < enem.getsize + @size) &&(distance(@y, enem.getY) < enem.getsize + @size)
         if(enem.getPhase[0] == "a" && enem.getPhase[1] == "16")
+          @parried = true
+        end
+      end
+    end
+    if(@parried == true)
+      for enem in @enemies
+        if (distance(@x, enem.getX) < enem.getsize + @size) &&(distance(@y, enem.getY) < enem.getsize + @size)
           enem.setPhase(1, 0)
           enem.getKnockBack(@kbx, @kby)
           enem.damageHP(2*@damage)
-          @parried = true
           @pings += 1
         end
       end

@@ -38,7 +38,7 @@ class Equipment
             @iddesc = "Attacks burn health \nand do more \ndamage"
         elsif(random == 5)
             @majorid = "Fury"
-            @iddesc = "Attacks do more \ndamage the lower \nhealth"
+            @iddesc = "Attacks do more \ndamage the \nless health"
         elsif(random == 6)
             @majorid = "AMR"
             @iddesc = "Bullets have more \nknockback"

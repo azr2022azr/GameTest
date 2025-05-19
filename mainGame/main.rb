@@ -145,18 +145,23 @@ class GameWindow < Gosu::Window
         a.draw
         if a.didparry
           dp = true
-          @player.heal(@player.getMaxHP * 0.03)
         end
       end
 
       dakka = false
+      healer = false
 
       for i in @player.getAccessoryList
         if i.getMajorID == "Shock Absorbers" && dp
           @player.setDash(0)
         elsif i.getMajorID == "Reap"
           dakka = true
+        elsif i.getMajorID == "Barrier" && dp
+          healer = true
         end
+      end
+      if healer && dp
+        @player.heal(@player.getMaxHP * 0.05)
       end
 
       enemtemp = 0

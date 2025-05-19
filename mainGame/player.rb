@@ -19,7 +19,7 @@ class Player
     @atkCooldown = 0
     @atkRate = 8
     @level = 1
-    @xp = 0
+    @xp = 90
     @sust = 0
     @dashCooldown = 0
     @atk2Cooldown = 0
