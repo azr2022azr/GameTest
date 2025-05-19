@@ -73,9 +73,9 @@ class Enemy
     #if playerx > @enxPos directional IMPORTANT
     #Gosu::Image.new("C:/GameTest/textures/" + @name.to_s + @actionframe.to_s + ".png").draw_rot(@enxPos, @enyPos + 112, 1)
     if(@actionframe[0] != "k")
-      Gosu::Image.new("C:/GameTest/textures/enemy/" + @name.to_s + @actionframe[0].to_s + (@actionframe[1].to_i/6).to_s + @actionframe[2].to_s + ".png").draw_rot(@enxPos-playerx+160, @enyPos, 1)
+      Gosu::Image.new("C:/GameTest/textures/enemy/" + @name.to_s + @actionframe[0].to_s + (@actionframe[1].to_i/6).to_s + @actionframe[2].to_s + ".png").draw_rot(@enxPos-playerx+160, @enyPos, 2)
     else
-      Gosu::Image.new("C:/GameTest/textures/enemy/basica0" + @actionframe[2].to_s + ".png").draw_rot(@enxPos-playerx+160, @enyPos, 1)
+      Gosu::Image.new("C:/GameTest/textures/enemy/basica0" + @actionframe[2].to_s + ".png").draw_rot(@enxPos-playerx+160, @enyPos, 2)
     end
   end
 
@@ -140,6 +140,52 @@ class Enemy
       @enyPos = 224
     elsif @enyPos < 0
       @enyPos = 0
+    end
+  end
+end
+
+
+class Rat < Enemy
+  def initialize(name, x, y, backdiff)
+    @diff = backdiff
+    @enhp = (150 + Random.rand(30..70) * (1+(@diff/2)))/3
+    @enws = (10 + Random.rand(10..25) * (1+(@diff/20)))*4
+    @endamage = (2 * (1+(@diff/30)))*3
+    @enxPos = x
+    @enyPos = y
+    @enname = name
+    @enSize = 26
+    @name = name
+    @actionframe = ["n", "0", "l"]
+    @kbex = 0
+    @kbey = 0
+    @invuln = 0
+  end
+
+  def draw(playerx, playery)
+    #if playerx > @enxPos directional IMPORTANT
+    #Gosu::Image.new("C:/GameTest/textures/" + @name.to_s + @actionframe.to_s + ".png").draw_rot(@enxPos, @enyPos + 112, 1)
+    if(@actionframe[0] != "k")
+      Gosu::Image.new("C:/GameTest/textures/enemy/rat" + @actionframe[0].to_s + (@actionframe[1].to_i/6).to_s + @actionframe[2].to_s + ".png").draw_rot(@enxPos-playerx+160, @enyPos, 1)
+    else
+      Gosu::Image.new("C:/GameTest/textures/enemy/rata0" + @actionframe[2].to_s + ".png").draw_rot(@enxPos-playerx+160, @enyPos, 1)
+    end
+  end
+
+  def getKnockBack(momentx, momenty)
+    if @invuln == 0 && (@actionframe[0] == "a" || @actionframe[0] == "k")
+      @actionframe[0] = "k"
+      @actionframe[1] = "0"
+      @actionframe[2] = "l"
+      @kbex = momentx
+      @kbey = momenty
+      @invuln = 1
+    end
+  end
+
+  def damageHP(damage)
+    if @invuln == 0 && (@actionframe[0] == "a" || @actionframe[0] == "k")
+      @enhp -= damage
     end
   end
 end

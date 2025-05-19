@@ -1,6 +1,7 @@
 require_relative "enemy"
+require_relative "equipment"
 class PlayerAttack
-  def initialize(x, y, damage, rotation, enemies)
+  def initialize(x, y, damage, rotation, enemies, gear, knock)
     @rot = rotation
     @x = x
     @y = y
@@ -13,8 +14,10 @@ class PlayerAttack
     @ticksalive = 0
     @enemies = enemies
     @kbx = 0
+    @gear = gear
     @kby = 0
-    @kb = 4
+    @kb = knock
+    @pings = 0
   end
 
   def draw
@@ -75,11 +78,17 @@ class PlayerAttack
     end
   end
 
+  def getpings
+    return @pings
+  end
+  
   def tickAttack
+    @pings = 0
     for enem in @enemies
-      if (distance(@x, enem.getX) < @enemies.length + @size) &&(distance(@y, enem.getY) < @enemies.length + @size)
+      if (distance(@x, enem.getX) < @size) &&(distance(@y, enem.getY) < @size)
         enem.damageHP(@damage)
         enem.getKnockBack(@kbx, @kby)
+        @pings += 1
       end
     end
     @ticksalive += 1

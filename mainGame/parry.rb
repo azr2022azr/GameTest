@@ -1,6 +1,7 @@
 require_relative "enemy"
+require_relative "equipment"
 class PlayerParry
-  def initialize(x, y, damage, rotation, enemies)
+  def initialize(x, y, damage, rotation, enemies, gear, knock)
     @rot = rotation
     @x = x
     @y = y
@@ -14,7 +15,18 @@ class PlayerParry
     @enemies = enemies
     @kbx = 0
     @kby = 0
-    @kb = 4
+    @gear = gear
+    @kb = knock
+    @pings = 0
+    @parried = false
+  end
+
+  def didparry
+    return @parried
+  end
+
+  def getpings
+    return @pings
   end
 
   def draw
@@ -76,12 +88,16 @@ class PlayerParry
   end
 
   def tickParry
+    @parried = false
+    @pings = 0
     for enem in @enemies
-      if (distance(@x, enem.getX) < @enemies.length + @size) &&(distance(@y, enem.getY) < @enemies.length + @size)
+      if (distance(@x, enem.getX) < enem.getsize + @size) &&(distance(@y, enem.getY) < enem.getsize + @size)
         if(enem.getPhase[0] == "a" && enem.getPhase[1] == "16")
           enem.setPhase(1, 0)
           enem.getKnockBack(@kbx, @kby)
           enem.damageHP(2*@damage)
+          @parried = true
+          @pings += 1
         end
       end
     end
