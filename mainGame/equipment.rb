@@ -19,6 +19,7 @@ class Equipment
             rado = Random.rand(0..4)
             @stats[rado] += Random.rand(9..13)*@valueList[rado] * backDiff
         end
+        @stats[4] = Math.sqrt(@stats[4])
     end
 
     if(@rarity >= 3 && @type == 3)

@@ -45,6 +45,7 @@ class GameWindow < Gosu::Window
     @enemies = [Enemy.new("basic", @player.getX + Random.rand(-170..170), Random.rand(0...224), @backdiff)]
     @attacklist = []
     @equipment = []
+    @pity = 0
   end
   #update draw
   def draw
@@ -111,15 +112,25 @@ class GameWindow < Gosu::Window
       @attacklist = @player.throwAttackList
       @parrylist = @player.throwParryList
 
-      if(Random.rand(0..240) == 0 && @enemies.length < 20)
+      zono = 480/Math.sqrt(@backdiff)
+      if zono < 100
+        zono = 100
+      elsif zono > 240
+        zono = 240
+      end
+
+      @pity += 1
+
+      if(Random.rand(0..zono) == 0 && @enemies.length < 20) || @pity >= 360
         if(Random.rand(0..3) != 3)
           @enemies.push(Enemy.new("basic", @player.getX + Random.rand(-170..170), Random.rand(0...224), @backdiff))
         else
           @enemies.push(Rat.new("rat", @player.getX + Random.rand(-170..170), Random.rand(0...224), @backdiff))
         end
+        @pity = 0
       end
 
-      if(@tomere % 1440 == 0)
+      if(@tomere % 1000 == 0)
         @backdiff += 1
       end
 
@@ -170,13 +181,13 @@ class GameWindow < Gosu::Window
       end
 
       temphp = @player.showHealth.to_f/@player.getMaxHP.to_f
-      draw_rect(0,0,42,14,Gosu::Color.argb(0xff_000000), 1)
-      draw_rect(1,1,40,12,Gosu::Color.argb(0xff_ffffff), 1)
-      draw_rect(1,1,(temphp * 40).round(0),12,Gosu::Color.argb(0xff_ff0000), 1)
+      draw_rect(0,0,42,14,Gosu::Color.argb(0xff_000000), 3)
+      draw_rect(1,1,40,12,Gosu::Color.argb(0xff_ffffff), 3)
+      draw_rect(1,1,(temphp * 40).round(0),12,Gosu::Color.argb(0xff_ff0000), 3)
       
-      draw_rect(278,0,42,14,Gosu::Color.argb(0xff_000000), 1)
-      draw_rect(279,1,40,12,Gosu::Color.argb(0xff_ffffff), 1)
-      draw_rect(279,1,((@player.showXP.to_f/100) * 40).round(0),12,Gosu::Color.argb(0xff_00ff00), 1)
+      draw_rect(278,0,42,14,Gosu::Color.argb(0xff_000000), 3)
+      draw_rect(279,1,40,12,Gosu::Color.argb(0xff_ffffff), 3)
+      draw_rect(279,1,((@player.showXP.to_f/100) * 40).round(0),12,Gosu::Color.argb(0xff_00ff00), 3)
 #
     elsif @gamePhase == 3
       @tomere = 0
@@ -235,8 +246,7 @@ class GameWindow < Gosu::Window
       @font.draw_text("Difficulty: " + @backdiff.to_s, 120, 10, 1)
 
       if(@wo1.getMajorID != "")
-        @font.draw_text(@wo1.getMajorID, 30, 80+22*s, 1)
-        @font.draw_text(@wo1.getIDDESC, 30, 80+22*(s+1), 1)
+        @font.draw_text(@wo1.getIDDESC, 30, 80+22*(s+0), 1)
       end
 
       if(@wo1.getType == 1)
@@ -297,8 +307,7 @@ class GameWindow < Gosu::Window
       end#
 
       if(@wo2.getMajorID != "")
-        @font.draw_text(@wo2.getMajorID, 130, 80+22*s, 1)
-        @font.draw_text(@wo2.getIDDESC, 130, 80+22*(s+1), 1)
+        @font.draw_text(@wo2.getIDDESC, 130, 80+22*(s+0), 1)
       end
 
       s = 0
@@ -325,8 +334,7 @@ class GameWindow < Gosu::Window
       end
 
       if(@wo3.getMajorID != "")
-        @font.draw_text(@wo3.getMajorID, 230, 80+22*s, 1)
-        @font.draw_text(@wo3.getIDDESC, 230, 80+22*(s+1), 1)
+        @font.draw_text(@wo3.getIDDESC, 230, 80+22*(s+0), 1)
       end
 
       @tempsButtonReturn << @selectButton1.tickButton(mouse_x, mouse_y)

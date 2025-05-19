@@ -2,9 +2,9 @@ require_relative "usefulFunctions"
 class Enemy
   def initialize(name, x, y, backdiff)
     @diff = backdiff
-    @enhp = 50 + Random.rand(30..70) * (1+(@diff)) * 2
-    @enws = 10 + Random.rand(5..20) * (1+(@diff/20))
-    @endamage = 2 * (1+(@diff/30))
+    @enhp = 50 + Random.rand((30+@diff)..(70+@diff)) * (1+(@diff)) * 2
+    @enws = 10 + Random.rand(10..25) * (1+(@diff/20))
+    @endamage = 3 * (1+(@diff/30))
     @enxPos = x
     @enyPos = y
     @enname = name
@@ -148,7 +148,7 @@ end
 class Rat < Enemy
   def initialize(name, x, y, backdiff)
     @diff = backdiff
-    @enhp = (150 + Random.rand(30..70) * (1+(@diff)))/3
+    @enhp = (150 + Random.rand((30+@diff)..(70+@diff)) * (1+(@diff)))/3
     @enws = (10 + Random.rand(10..25) * (1+(@diff/20)))*4
     @endamage = (2 * (1+(@diff/30)))*3
     @enxPos = x
