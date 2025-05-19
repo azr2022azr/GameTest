@@ -196,7 +196,9 @@ class GameWindow < Gosu::Window
       @attacklist = []
       @player.die
       @lastPhaseDeath = true
-      @gamePhase = 8
+      if(@player.getlife > 0)
+        @gamePhase = 8
+      end
     
     #no6
     elsif (@gamePhase == 6)

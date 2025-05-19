@@ -19,7 +19,7 @@ class Player
     @atkCooldown = 0
     @atkRate = 8
     @level = 1
-    @xp = 90
+    @xp = 0
     @sust = 0
     @dashCooldown = 0
     @atk2Cooldown = 0
@@ -149,7 +149,7 @@ class Player
     @atkCooldown = 0
     @atkRate = 8
     @level = 1
-    @xp = 90
+    @xp = 0
     @sust = 0
     @dashCooldown = 0
     @atk2Cooldown = 0
@@ -164,10 +164,17 @@ class Player
     @kbbase = 4
     @lasthits = 0.0
 
+    temp = @accessory
+    @accessory = [Equipment.new(0,"bung", 3, 1, 1)]
+
+    for i in temp
+      if(Random.rand(0..9) == 0)
+        @accessory.push(i)
+      end
+    end
+
     @weapon1 = Equipment.new(1, "Default Dagger", 1, 1, 0)
     @weapon2 = Equipment.new(0, "none", 1, 1, 0)
-  
-    @accessory = [Equipment.new(0,"bung", 3, 1, 1)]
     
     for i in @accessory do
       loc = 0
